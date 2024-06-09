@@ -1,8 +1,7 @@
 package br.com.siswbrasil.repository;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 
-public interface BaseRepository<T,ID> extends PanacheRepository<T> {
-
+public interface BaseRepository<T, ID> extends PanacheRepositoryBase<T, ID> {
 
 }
