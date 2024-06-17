@@ -2,11 +2,15 @@ package br.com.siswbrasil.resource;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 
 import br.com.siswbrasil.repository.BaseRepository;
 import br.com.siswbrasil.service.BaseService;
+import br.com.siswbrasil.util.PaginatedResponse;
 import io.quarkus.panache.common.Page;
+import io.quarkus.panache.common.Sort;
+import io.quarkus.panache.common.Sort.Direction;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -38,6 +42,42 @@ public abstract class BaseResourceImpl<T, ID> implements BaseResource<T, ID> {
 	public T findById(@PathParam("id") ID id) {
 		return service.findById(id);
 	}
+	
+	@Operation(summary = "findAllPageable", description = "Lista todos os itens com daods de paginação e ordenação")
+	@GET
+	@Path("/page")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Override
+	public PaginatedResponse<T> findAllPageable(
+			@QueryParam("page") @DefaultValue("0") Integer pageIndex,
+			@QueryParam("size") @DefaultValue("20") Integer pageSize,
+			@QueryParam("sort") String... sortList) {
+
+		Sort sort = Sort.by();
+		for (String item : sortList) {
+			if (StringUtils.containsAnyIgnoreCase(item, ",asc")) {
+				item = StringUtils.replaceIgnoreCase(item, ",asc", "");
+				sort.and(item, Direction.Ascending);  
+			} else if (StringUtils.containsAnyIgnoreCase(item, ",desc")) {
+				item = StringUtils.replaceIgnoreCase(item, ",desc", "");
+				sort.and(item, Direction.Descending);
+			} else {  
+				sort.and(item, Direction.Ascending);
+			}
+		}
+
+		var query = repository
+				.findAll(sort)
+				.page(Page.of(pageIndex, pageSize));
+
+		var response = new PaginatedResponse<T>();
+		response.setTotal(query.count());
+		response.setContent(query.stream().toList());
+		response.setPages(query.pageCount());
+		response.setPageSize(pageSize);
+
+		return response;
+	}	
 
 }
 

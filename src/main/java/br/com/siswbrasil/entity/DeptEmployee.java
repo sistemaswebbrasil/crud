@@ -16,9 +16,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "dept_manager")
+@Table(name = "dept_emp")
 @IdClass(DeptManagerPk.class)
-public class DeptManager extends PanacheEntityBase {
+public class DeptEmployee extends PanacheEntityBase {
 
 	@Id
 	@Column(name = "emp_no")
@@ -34,8 +34,8 @@ public class DeptManager extends PanacheEntityBase {
 	@Column(name = "to_date")
 	private Date toDate;
 
-	@JoinColumn(name = "dept_no")
-	@ManyToOne
-	private Department department;
+//	@JoinColumn(name = "dept_no")
+//	@ManyToOne
+//	private Department department;
 
 }

@@ -2,6 +2,8 @@ package br.com.siswbrasil.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,32 +12,40 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Entity
-@Table(name = "dept_manager")
-@IdClass(DeptManagerPk.class)
-public class DeptManager extends PanacheEntityBase {
+@Table(name = "titles")
+@IdClass(TitlePk.class)
+public class Title extends PanacheEntityBase {
 
+	@EqualsAndHashCode.Include
 	@Id
+	@Size(min = 4, max = 4)
 	@Column(name = "emp_no")
-	protected Long empNo;
+	private Long empNo;
 
 	@Id
-	@Column(name = "dept_no")
-	protected String deptNo;
+	@Size(max = 40)
+	@NotBlank
+	@Column(name = "title")
+	private String title;
 
+	@Id
 	@Column(name = "from_date")
 	private Date fromDate;
 
 	@Column(name = "to_date")
 	private Date toDate;
 
-	@JoinColumn(name = "dept_no")
+	@JsonIgnore
+	@JoinColumn(name = "emp_no", referencedColumnName = "emp_no")
 	@ManyToOne
-	private Department department;
+	private Employee employee;
 
 }
